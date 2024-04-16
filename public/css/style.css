@@ -1,0 +1,27 @@
+footer {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 20px 0;
+}
+
+.page-container {
+display: grid;
+grid-template-rows: auto 1fr auto;
+min-height: 100vh;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+.typed-out {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 5s forwards;
+    width: 0;
+}
+
+.pattern-background {
+    background: repeating-linear-gradient(20deg, #f3f3f3, #f3f3f3 20px, transparent 200px, transparent 40px);
+}
