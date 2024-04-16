@@ -1,59 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f8f9fa;
-    }
-    .form-container {
-      max-width: 400px;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #007bff;
-      margin-bottom: 30px;
-    }
-    .btn-login {
-      font-size: 1.2rem;
-      width: 100%;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1 class="mb-4">EvalForm</h1>
-    <div class="row justify-content-center">
-      <div class="col-md-8 form-container">
-        <h2 class="text-center mb-4">Login</h2>
-        <form id="loginForm" action="<?= base_url('home')?>">
-          <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-          </div>
-          <button type="submit" class="btn btn-primary btn-login">Login</button>
-        </form>
-        <div class="text-center mt-3">
-          <p>Not registered? <a href="<?= base_url('create-account')?>">Create an Account</a></p>
+<?= $this->extend('userTemplate') ?>
+<?= $this->section('content') ?>
+
+<section class="py-5 bg-light pattern-background">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                
+            <?php if (session()->has('error')): ?>
+                <div class="alert alert-danger" id="flash-message"><?= session('error') ?></div>
+                <script>
+                    setTimeout(function() {
+                        document.getElementById('flash-message').style.display = 'none';
+                    }, 4000); 
+                </script>
+            <?php endif; ?>
+
+
+                <?php if (isset($name)): ?>
+                    <h1 class="typed-out">Hello, <?= esc($name) ?>!</h1>
+                <?php else: ?>
+                    <h1 class="typed-out">Welcome to EvalForm!</h1>
+                <?php endif ?>
+
+                <p class="lead">EvalForm helps users create, edit and view surveys.</p>
+
+                <?php if (isset($name)): ?>
+                    <a href="<?= base_url('view-surveys')?>" class="btn btn-primary btn-lg mb-3 mb-lg-0">View Your Surveys</a>
+                    <a href="<?= base_url('edit-survey')?>" class="btn btn-primary btn-lg mb-3 mb-lg-0">Create a Survey</a>
+                <?php else: ?>
+                    <a href="<?= base_url('login')?>" class="btn btn-primary btn-lg mb-3 mb-lg-0">Get Started</a>
+                <?php endif ?>
+                
+            </div>
+            <div class="col-lg-6">
+                <img src="<?= base_url('images/evalform-home.png') ?> " alt="HomePage Screenshot" class="img-fluid rounded shadow">
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</body>
-</html>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Change the Way You Create Surveys!</h2>
+        <div class="row">
+
+            <?php foreach ($cards as $card) : ?>
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title"><?= esc($card['title']); ?></h4>
+                            <p class="card-text"><?= esc($card['text']); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+        </div>
+    </div>
+</section>
+
+<?= $this->endSection() ?>

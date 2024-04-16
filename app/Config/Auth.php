@@ -74,8 +74,8 @@ class Auth extends ShieldAuth
      * to apply any logic you may need.
      */
     public array $redirects = [
-        'register'          => 'home',
-        'login'             => 'home',
+        'register'          => '/',
+        'login'             => '/',
         'logout'            => 'login',
         'force_reset'       => '/',
         'permission_denied' => '/',
@@ -203,7 +203,7 @@ class Auth extends ShieldAuth
      */
     public array $sessionConfig = [
         'field'              => 'user',
-        'allowRemembering'   => true,
+        'allowRemembering'   => false,
         'rememberCookieName' => 'remember',
         'rememberLength'     => 30 * DAY,
     ];
@@ -443,7 +443,7 @@ class Auth extends ShieldAuth
             return '/admin';
         }
 
-        return '/home';
+        return '/';
 
         // return $this->getUrl($url);
     }

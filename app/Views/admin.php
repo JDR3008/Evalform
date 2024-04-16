@@ -40,7 +40,7 @@
           <!-- Sign Out option -->
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('')?>">Sign Out</a>
+              <a class="nav-link" href="<?= base_url('logout')?>">Sign Out</a>
             </li>
           </ul>
         </div>

@@ -21,7 +21,7 @@
 </style>
 
     <div class="container login-container">
-        <h1 style="color: #007bff">EvalForm</h1>
+        <h1 style="color: #007bff; margin: 20px;">EvalForm</h1>
         <div class="card col-12 col-md-5 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title mb-5"><?= lang('Auth.register') ?></h5>

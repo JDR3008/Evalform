@@ -7,22 +7,22 @@
 <style>
     body {
         height: 100vh;
-        display: flex; /* Use flexbox for the body */
+        display: flex; 
         justify-content: center;
         align-items: center;
     }
 
     .login-container {
-        text-align: center; /* Center content of the login section */
+        text-align: center; 
     }
     .card {
-        margin: 0 auto; /* Center the card horizontally */
+        margin: 0 auto; 
     }
 </style>
 
 
     <div class="container login-container">
-        <h1 style="color: #007bff">EvalForm</h1>
+        <h1 style="color: #007bff; margin: 20px;" >EvalForm</h1>
         <div class="card col-12 col-md-5 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title mb-5"><?= lang('Auth.login') ?></h5>
@@ -80,7 +80,7 @@
                     <?php endif ?>
 
                     <?php if (setting('Auth.allowRegistration')) : ?>
-                        <p class="text-center"><?= lang('Auth.needAccount') ?> <a href="<?= url_to('register') ?>"><?= lang('Auth.register') ?></a></p>
+                        <p class="text-center">Not Registered? <a href="<?= url_to('register') ?>">Create an Account</a></p>
                     <?php endif ?>
 
                 </form>

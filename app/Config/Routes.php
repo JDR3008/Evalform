@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 //$routes->get('/', 'Home::index');
 $routes->get('/', 'EvalformController::index');
-$routes->get('/home', 'EvalformController::home');
+// $routes->get('/home', 'EvalformController::home');
 $routes->get('/view-surveys', 'EvalformController::viewSurveys');
 $routes->get('/edit-survey', 'EvalformController::createSurvey');
 $routes->get('/admin', 'EvalformController::admin');
