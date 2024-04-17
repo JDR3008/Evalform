@@ -50,15 +50,19 @@
     <!-- Table of users -->
     <section class="py-5">
         <div class="container table-container">
+        <h1 style="margin-bottom: 40px;">Hello, <?= esc($name) ?>!</h1>
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>User Management</h2>
             </div>
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search...">
-                        <button class="btn btn-primary" type="button">Search</button>
-                    </div>
+                    <form method="get" action="<?= base_url('admin/'); ?>">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search..." name="search">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div> 
+                    </form>
+                    
                 </div>
                 <div class="col-md-6 text-md-end">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
@@ -69,57 +73,62 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>User ID</th>
+                            <th>ID</th>
                             <th>Username</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
+                            <th>Type</th>
                             <th>Email</th>
                             <th>Last Updated</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>s1234567</td>
-                            <td>James</td>
-                            <td>De Raat</td>
-                            <td>jamesderaat@example.com</td>
-                            <td>2024-03-26</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-2">Edit</button>
-                                <button class="btn btn-sm btn-danger me-2">Make Inactive</button>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= esc($user->id) ?></td>
+                                <td><?= esc($user->username) ?></td>
+                                <td><?= esc($user->group) ?></td>
+                                <td><?= esc($user->secret) ?></td>
+                                <td><?= esc($user->updated_at) ?></td>
+
+                                <?php if ($user->active): ?>
+                                    <td style="color: white" class="bg-success">Active</td>
+                                <?php else: ?>
+                                    <td style="color: white" class="bg-danger">Inactive</td>
+                                <?php endif ?>
+
                                 
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>billsmith</td>
-                            <td>Bill</td>
-                            <td>Smith</td>
-                            <td>billsmith@example.com</td>
-                            <td>2024-03-27</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-2">Edit</button>
-                                <button class="btn btn-sm btn-success me-2">Make Active</button>
-                            </td>
-                        </tr>
+                                <td>
+                                    <div class="d-flex">
+                                        <button class="btn btn-sm btn-primary me-2 edit-user-btn" 
+                                            data-bs-toggle="modal" data-bs-target="#editUserModal"
+                                            data-user-id="<?= $user->id ?>" 
+                                            data-email="<?= $user->secret ?>"
+                                            data-username="<?= $user->username ?>">
+                                            Edit
+                                        </button>
+
+                                        <form action="<?= base_url('admin/changeStatus/' . $user->id); ?>" method="post">
+                                            <div class= "input-group">
+                                                <button type="submit" class="btn btn-sm btn-primary me-2">Change Status</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                <td>
+                            </tr>
+                        <?php endforeach; ?>
+
                     </tbody>
                 </table>
             </div>               
+            
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
+                    <?= $pager->links() ?>
                 </ul>
             </nav>
+
         </div>
     </section>
 
@@ -133,40 +142,66 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="addUserForm" action="<?= base_url('admin/add'); ?>" method="post">
                         <div class="mb-3">
-                            <label for="userId" class="form-label">User ID</label>
-                            <input type="text" class="form-control" id="userId" value="3" disabled> <!-- Disabled so user cannot change value -->
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
                         </div>
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username">
+                            <input type="text" class="form-control" id="username" name="username">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password">
+                            <input type="password" class="form-control" id="password" name="password">
                         </div>
-                        <div class="mb-3">
-                            <label for="firstName" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="firstName">
-                        </div>
-                        <div class="mb-3">
-                            <label for="lastName" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="lastName">
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Add</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm" action="<?= base_url('admin/edit'); ?>" method="post">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">ID</label>
+                            <input type="text" class="form-control" id="id" name="id"  readonly="readonly">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- Footer -->
     <footer class="text-center">
@@ -177,6 +212,29 @@
     
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+       
+       var editUserModal = document.getElementById('editUserModal')
+       editUserModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget
+        var email = button.getAttribute('data-email')
+        var username = button.getAttribute('data-username')
+        var id = button.getAttribute('data-user-id')
+
+        var modalTitle = editUserModal.querySelector('.modal-title')
+        var idInput = editUserModal.querySelector('.modal-body input[name=id]')
+        var emailInput = editUserModal.querySelector('.modal-body input[name=email]')
+        var usernameInput = editUserModal.querySelector('.modal-body input[name=username]')
+
+        
+        modalTitle.textContent = "Edit User " + id
+        idInput.value = id
+        emailInput.value = email
+        usernameInput.value = username
+       });
+
+    </script>
 </body>
 </html>
 

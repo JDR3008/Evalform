@@ -1,6 +1,7 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\Controller;
+use CodeIgniter\Shield\Entities\User;
 
 class EvalformController extends BaseController
 {
@@ -29,9 +30,15 @@ class EvalformController extends BaseController
     }
 
     public function index()
-    {  
+    {
+        $user = auth()->user();
+        
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
+        }
+
+        if (!is_null($user) && $user->inGroup('admin')) {
+            return redirect()->back();
         }
         
         $data['cards'] = self::CARDS;
@@ -50,25 +57,64 @@ class EvalformController extends BaseController
 
     public function admin()
     {
-
         $user = auth()->user();
         $data['cards'] = self::CARDS;
+
+        if (auth()->loggedIn()) {
+            $data['name'] = auth()->user()->username;
+        }
         
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
         }
 
         if (!auth()->loggedIn()) {
-            return view('login');
+            return redirect()->back();
         }
 
         if ($user->inGroup('user')) {
             session()->setFlashdata('error', 'You do not have the required permissions.');
-            return redirect()->back(); // Or redirect to another suitable page  
-            // return view('index', $data);
+            return redirect()->back(); 
         }
 
-        return view('admin');
+        $model = auth()->getProvider();
+
+        // Fetch search query
+        $search = $this->request->getGet('search');
+
+        $model
+            ->select('users.id, users.username, auth_groups_users.group, auth_identities.secret, users.active, users.updated_at')
+            ->join('auth_groups_users', 'users.id = auth_groups_users.user_id', 'inner')
+            ->join('auth_identities', 'users.id = auth_identities.user_id', 'inner');
+
+        $searchableColumns = ['users.id', 'users.username', 'auth_groups_users.group', 'auth_identities.secret', 'users.active', 'users.updated_at'];
+
+        // Apply search filter if search query is provided
+        if (!empty($search)) {
+            $conditions = [];
+
+            foreach ($searchableColumns as $column) {
+                $conditions[] = $column . " LIKE '%$search%'";
+            }
+
+            $whereClause = implode(' OR ', $conditions);
+
+            $model->where($whereClause);
+        }
+
+        // Paginate the results
+        $perPage = 6; // Maximum results per page
+        // $currentPage = $this->request->getVar('page') ? $this->request->getVar('page') : 1;
+
+        // Fetch paginated users
+        $users = $model->paginate($perPage);
+
+        // Pass paginated users and pager to the view
+        $data['users'] = $users;
+        $data['pager'] = $model->pager;
+        
+
+        return view('admin', $data);
     }
 
     public function login()
@@ -81,27 +127,69 @@ class EvalformController extends BaseController
         return view('register');
     }
 
-    public function landing()
+    public function changeStatus($id)
     {
+        $model = auth()->getProvider();
 
-        $cards = array(
-            array(
-                'title' => 'Create Surveys',
-                'text' => 'Choose from a variety of question types to generate your specific survey.'
-            ),
-            array(
-                'title' => 'Visualise Your Responses',
-                'text' => 'EvalForm does all the hard work for you by producing simple charts for your responses.'
-            ),
-            array(
-                'title' => 'Export Your Responses',
-                'text' => 'Say goodbye to having to manually export data, EvalForm does it for you!'
-            )
-        );
+        $user = $model->findById($id);
 
-        $data['cards'] = $cards;
-        return view('landing', $data);
+        if ($user->active) {
+            $user->deactivate();
+        } else {
+            $user->activate();
+        } 
+
+        return redirect()->back();
     }
+    
+    public function adduser()
+    {
+        $users = auth()->getProvider();
+
+        $user = new User([
+            'username' => $this->request->getPost('username'),
+            'email'    => $this->request->getPost('email'),
+            'password' => $this->request->getPost('password'),
+        ]);
+        $users->save($user);
+
+        
+
+        $user = $users->findById($users->getInsertID());
+
+        $users->addToDefaultGroup($user);
+        $user->activate();
+
+        return redirect()->back();
+        
+    }
+
+    public function edituser()
+    {
+        $users = auth()->getProvider();
+
+        $id = $this->request->getPost('id');
+
+        $user = $users->findById($id);
+
+        $fields = [
+            'username' => $this->request->getPost('username'),
+            'email'    => $this->request->getPost('email'),
+        ];
+
+        if (!empty($this->request->getPost('password'))) {
+            $fields[2] = $this->request->getPost('password');
+        }
+
+        $user->fill($fields);
+
+        $users->save($user);
+
+        return redirect()->back(); 
+
+
+    }
+    
 }
 
 
