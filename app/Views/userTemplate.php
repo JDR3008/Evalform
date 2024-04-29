@@ -25,10 +25,7 @@
 
                     <?php if (isset($name)): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('home')?>">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('edit-survey')?>">Create Survey</a>
+                            <a class="nav-link" href="<?= base_url('')?>">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= base_url('view-surveys')?>">View Surveys</a>
@@ -62,7 +59,7 @@
     <!-- Footer -->
     <footer class="text-center">
         <div class="container">
-            <p>&copy; <?= date('Y') ?> EvalForm</p>
+            <p class="mb-0">&copy; <?= date('Y') ?> EvalForm</p>
         </div>
     </footer>
 

@@ -47,7 +47,21 @@ class EvalformController extends BaseController
 
     public function viewSurveys()
     {
-        return view('viewSurveys');
+        
+        $userId = auth()->user()->id;
+        $model = new \App\Models\SurveyModel();
+
+        $surveys = $model->findAll();
+
+        $data['surveys'] = $model
+            ->orderBy('updated_at','DESC')
+            ->where('user_id', $userId)
+            ->findAll();
+
+
+        $data['name'] = $userId;
+
+        return view('viewSurveys', $data);
     }
 
     public function createSurvey()
@@ -60,10 +74,6 @@ class EvalformController extends BaseController
         $user = auth()->user();
         $data['cards'] = self::CARDS;
 
-        if (auth()->loggedIn()) {
-            $data['name'] = auth()->user()->username;
-        }
-        
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
         }
@@ -104,7 +114,6 @@ class EvalformController extends BaseController
 
         // Paginate the results
         $perPage = 6; // Maximum results per page
-        // $currentPage = $this->request->getVar('page') ? $this->request->getVar('page') : 1;
 
         // Fetch paginated users
         $users = $model->paginate($perPage);
@@ -178,7 +187,7 @@ class EvalformController extends BaseController
         ];
 
         if (!empty($this->request->getPost('password'))) {
-            $fields[2] = $this->request->getPost('password');
+            $fields["password"] = $this->request->getPost('password');
         }
 
         $user->fill($fields);
@@ -188,6 +197,41 @@ class EvalformController extends BaseController
         return redirect()->back(); 
 
 
+    }
+
+    public function deleteSurvey($id)
+    {
+        $model = new \App\Models\SurveyModel();
+        $model->delete($id);
+
+        return redirect()->back();
+    }
+
+    public function changeSurveyTitle()
+    {   
+        $surveys = new \App\Models\SurveyModel();
+
+        $survey = $this->request->getPost();
+
+        $surveys->save($survey);
+
+        return redirect()->back(); 
+        
+    }
+
+    public function viewSurvey($id)
+    {
+        $userId = auth()->user()->id;
+        $surveys = new \App\Models\SurveyModel();
+        $questions = new \App\Models\QuestionsModel();
+
+        $survey = $surveys->find($id);
+
+        
+        $data['name'] = $userId;
+        $data['title'] = $survey['title'];
+
+        return view ('survey', $data);
     }
     
 }

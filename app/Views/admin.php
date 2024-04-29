@@ -97,7 +97,6 @@
                                     <td style="color: white" class="bg-danger">Inactive</td>
                                 <?php endif ?>
 
-                                
                                 <td>
                                     <div class="d-flex">
                                         <button class="btn btn-sm btn-primary me-2 edit-user-btn" 
@@ -109,12 +108,9 @@
                                         </button>
 
                                         <form action="<?= base_url('admin/changeStatus/' . $user->id); ?>" method="post">
-                                            <div class= "input-group">
-                                                <button type="submit" class="btn btn-sm btn-primary me-2">Change Status</button>
-                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-primary me-2">Change Status</button>
                                         </form>
                                     </div>
-
                                 <td>
                             </tr>
                         <?php endforeach; ?>
@@ -206,7 +202,7 @@
     <!-- Footer -->
     <footer class="text-center">
         <div class="container">
-            <p>&copy; <?= date('Y') ?> EvalForm</p>
+            <p class="mb-0">&copy; <?= date('Y') ?> EvalForm</p>
         </div>
     </footer>
     

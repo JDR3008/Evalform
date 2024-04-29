@@ -26,7 +26,6 @@
 
                 <?php if (isset($name)): ?>
                     <a href="<?= base_url('view-surveys')?>" class="btn btn-primary btn-lg mb-3 mb-lg-0">View Your Surveys</a>
-                    <a href="<?= base_url('edit-survey')?>" class="btn btn-primary btn-lg mb-3 mb-lg-0">Create a Survey</a>
                 <?php else: ?>
                     <a href="<?= base_url('login')?>" class="btn btn-primary btn-lg mb-3 mb-lg-0">Get Started</a>
                 <?php endif ?>
