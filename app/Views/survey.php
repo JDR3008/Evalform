@@ -17,9 +17,12 @@
 
       <div class="mb-3"></div>
 
-      <a href="create-survey.html" class="btn btn-outline-success btn-lg" style="width: 100%;">
-        <i class="bi bi-save"></i> Edit
-      </a>
+      <div class="text-center">
+      <form action="<?= base_url('view-surveys/' . $id . '/edit-survey'); ?>" method="get">
+        <button type="submit" class="btn btn-outline-success btn-lg" style="width: 100%;">
+          <i class="bi bi-save"></i> Edit
+        </button>
+      </form>
 
       <div class="mb-3"></div>
 

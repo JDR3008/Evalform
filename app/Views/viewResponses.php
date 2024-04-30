@@ -7,7 +7,7 @@
     overflow: auto;
     }
 
-    #chart-container-1 { /* Replace with the specific container ID */
+    #chart-container-1 { 
     width: 300px; 
     height: 250px;
 }
@@ -20,6 +20,10 @@
     <?php for ($i = 0; $i < count($questions); $i++): ?>
         <h2>Question <?= $i + 1 ?> </h2>
         <p><?= $questions[$i]['question'] ?></p> 
+
+        <?php $questionResponses = array_filter($responses, function($response) use ($questions, $i) {
+            return $response['question_id'] == $questions[$i]['question_id'];
+        }); ?>
 
         <?php if (!empty($options[$questions[$i]['question_id']])): ?> 
             <?php foreach ($options[$questions[$i]['question_id']] as $option): ?>
@@ -37,7 +41,7 @@
 
         <h4>Responses</h4>
         
-        <?php if (!empty($responses)): ?> 
+        <?php if (!empty($questionResponses)): ?> 
             <div class="table-responsive"> 
                 <table class="table table-striped table-bordered table-hover table-responsive">
                     <thead class="sticky-top bg-white">
@@ -58,11 +62,8 @@
                     </tbody>
                 </table>
             </div>
-        <?php else: ?>
-            <p>No responses for this question yet.</p>
-        <?php endif; ?>
 
-        <?php if (!empty($options[$questions[$i]['question_id']])): ?> 
+            <?php if (!empty($options[$questions[$i]['question_id']])): ?> 
             <div id="chart-container-<?= $questions[$i]['question_id'] ?>" style="width: 50%; height: 50%; margin:auto;">
                 <canvas id="questionChart-<?= $questions[$i]['question_id'] ?>"></canvas>
             </div>
@@ -88,7 +89,7 @@
 
                 // Create the Chart
                 new Chart(questionChart, {
-                    type: 'pie', 
+                    type: 'doughnut', 
                     data: {
                         labels: optionLabels, 
                         datasets: [{
@@ -98,6 +99,10 @@
                     },
                 });
             </script>
+            
+        <?php endif; ?>
+        <?php else: ?>
+            <p>No responses for this question yet.</p>
         <?php endif; ?>
 
         <hr class="my-4">

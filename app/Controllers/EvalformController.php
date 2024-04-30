@@ -70,11 +70,6 @@ class EvalformController extends BaseController
         return view('viewSurveys', $data);
     }
 
-    public function createSurvey()
-    {
-        return view('createSurvey');
-    }
-
     public function admin()
     {
         $user = auth()->user();
@@ -350,19 +345,81 @@ class EvalformController extends BaseController
 
         fputcsv($output, array('Id', 'Question ID', 'Response'));
 
-        
-        if (count($responses) > 0) {
-            foreach ($responses as $response) {
-                $response_row = [
-                    $response['response_id'],
-                    $response['question_id'],
-                    $response['response']
-                ];
+        foreach ($responses as $response) {
+            $response_row = [
+                $response['response_id'],
+                $response['question_id'],
+                $response['response']
+            ];
 
-                fputcsv($output, $response_row);
-            }
+            fputcsv($output, $response_row);
         }
     }
+
+    public function editSurvey($id)
+    {
+
+        $data = $this->surveyViewer($id);
+
+        return view('editSurvey', $data);
+    }
+
+    public function createSurvey()
+    {
+        $surveys = new \App\Models\SurveyModel();
+
+        $userId = auth()->user()->id;
+        $title = $this->request->getPost('title');
+
+        $data = [
+            'user_id' => $userId,
+            'title' => $title
+        ];
+
+        $surveys->insert($data);
+
+        return redirect()->back();  
+    }
+
+    public function addQuestion($id)
+    {
+        $questions = new \App\Models\QuestionsModel();
+        $options = new \App\Models\OptionsModel();
+
+        $question = $this->request->getPost('question');
+
+        
+
+        $questionData = [
+            'survey_id' => $id,
+            'question' => $question
+        ];
+
+        $questions->insert($questionData);
+
+        for ($i = 0; $i < 4; $i++) {
+            if (!empty($this->request->getPost('option' . ($i + 1)))) {
+                $optionsData['question_id'] = $questions->getInsertID();
+                $optionsData["option_text"] = $this->request->getPost('option' . ($i + 1));
+                $options->insert($optionsData);
+            }
+        }
+        
+        return redirect()->to('view-surveys/' . $id . '/edit-survey');
+    }
+
+    public function deleteQuestion($id)
+    {
+
+        $questionId = $this->request->getPost('question_id');  
+
+        $model = new \App\Models\QuestionsModel();
+        $model->delete($questionId);
+
+        return redirect()->to('view-surveys/' . $id . '/edit-survey');
+    }
+
+
 }
 
 

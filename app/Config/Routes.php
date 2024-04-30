@@ -10,7 +10,7 @@ $routes->get('/', 'EvalformController::index');
 $routes->get('/login', 'EvalformController::login');
 $routes->get('/register', 'EvalformController::register');
 
-$routes->get('/edit-survey', 'EvalformController::createSurvey');
+
 
 $routes->get('/respondent-survey/(:num)', 'EvalformController::respondentSurvey/$1');
 $routes->post('/respondent-survey/(:num)/submitResponses','EvalformController::submitResponses/$1');
@@ -20,10 +20,18 @@ $routes->post('/respondent-survey/(:num)/submitResponses','EvalformController::s
 $routes->get('/view-surveys', 'EvalformController::viewSurveys');
 $routes->post('/view-surveys/deleteSurvey/(:num)','EvalformController::deleteSurvey/$1');
 $routes->post('/view-surveys/changeSurveyTitle','EvalformController::changeSurveyTitle');
+$routes->post('view-surveys/createSurvey','EvalformController::createSurvey');
+
 $routes->get('view-surveys/(:num)', 'EvalformController::viewSurvey/$1');
 $routes->get('view-surveys/(:num)/qrcode','EvalformController::getQRCodes/$1');
+$routes->get('view-surveys/(:num)/edit-survey', 'EvalformController::editSurvey/$1');
+
+$routes->post('view-surveys/(:num)/edit-survey/addQuestion', 'EvalformController::addQuestion/$1');
+$routes->post('view-surveys/(:num)/edit-survey/deleteQuestion', 'EvalformController::deleteQuestion/$1');
+
 $routes->get('view-surveys/responses/(:num)','EvalformController::viewResponses/$1');
 $routes->post('view-surveys/responses/(:num)/export','EvalformController::exportResponses/$1');
+
 
 $routes->group('admin', function($routes) {
     $routes->get('/', 'EvalformController::admin');

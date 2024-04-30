@@ -25,8 +25,6 @@
                         </div>
                         <p class="card-text">Last Updated: <?= esc($survey['updated_at']) ?>.</p>
                         <div>
-                            <!-- <a href="survey.html" class="btn btn-primary">View Survey</a> -->
-
                             <form class="d-inline" action="<?= base_url('view-surveys/' . $survey['survey_id']); ?>" method="get">
                                 <button type="submit" class="btn btn-primary" >View Survey</button>
                             </form>
@@ -73,14 +71,38 @@
 
 
      <!-- Create Survey Button -->
-  <div class="text-center">
-    <a href="<?php echo base_url('edit-survey'); ?>" class="btn btn-outline-primary btn-lg d-flex justify-content-center align-items-center mb-3" style="width: 100%;">
-      <i class="bi bi-plus" style="font-size: 4rem; font-weight: bold; line-height: 4rem;"></i>
-    </a>
-  </div>
+    <div class="text-center">
+        <button 
+            class="btn btn-outline-primary btn-lg" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#createSurveyModal"> 
+            <i class="bi bi-plus" style="font-size: 4rem; font-weight: bold; line-height: 4rem;"></i>
+        </button>
+    </div>
 
+    <div class="modal fade" id="createSurveyModal" tabindex="-1" aria-labelledby="changeTitleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeTitle">Create New Survey</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changetitleModal" action="<?= base_url('view-surveys/createSurvey'); ?>" method="post">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="title" class="form-control" id="title" name="title">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
-  </div>
+
+</div>
 
   <script>
        
