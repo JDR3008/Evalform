@@ -47,8 +47,17 @@ class EvalformController extends BaseController
 
     public function viewSurveys()
     {
-        
-        $userId = auth()->user()->id;
+        $user = auth()->user();
+        $userId = $user->id;
+
+        if (auth()->loggedIn()) {
+            $data['name'] = auth()->user()->username;
+        }
+
+        if (!is_null($user) && $user->inGroup('admin')) {
+            return redirect()->back();
+        }
+
         $model = new \App\Models\SurveyModel();
 
         $surveys = $model->findAll();
@@ -57,9 +66,6 @@ class EvalformController extends BaseController
             ->orderBy('updated_at','DESC')
             ->where('user_id', $userId)
             ->findAll();
-
-
-        $data['name'] = $userId;
 
         return view('viewSurveys', $data);
     }
@@ -221,19 +227,96 @@ class EvalformController extends BaseController
 
     public function viewSurvey($id)
     {
-        $userId = auth()->user()->id;
+        $data = $this->surveyViewer($id);
+
+        return view('survey', $data);
+    }
+
+    public function respondentSurvey($id)
+    {
+        $data = $this->surveyViewer($id);
+        unset($data['name']);
+
+        return view('respondentSurvey', $data);
+    }
+
+    private function surveyViewer($id)
+    {
+        // $userId = auth()->user()->id;
         $surveys = new \App\Models\SurveyModel();
         $questions = new \App\Models\QuestionsModel();
+        $options = new \App\Models\OptionsModel();
 
         $survey = $surveys->find($id);
 
-        
-        $data['name'] = $userId;
-        $data['title'] = $survey['title'];
+        $surveyQuestions = $questions
+        ->where('survey_id', $id)->findAll();
 
-        return view ('survey', $data);
+        $questionIds = array_column($surveyQuestions, 'question_id');
+
+        $optionsByQuestion = []; 
+        foreach ($questionIds as $questionId) {
+            $optionsByQuestion[$questionId] = $options
+                                    ->where('question_id', $questionId)
+                                    ->findAll();
+        }
+
+        $data = [
+            'name' => "filler",
+            'id' => $id,
+            'title' => $survey['title'],
+            'questions' => $surveyQuestions,
+            'options' => $optionsByQuestion
+        ];
+
+        return $data;
     }
-    
+
+    public function getQRCodes($id)
+    {
+        
+        $url = 'https://infs3202-42fc98bb.uqcloud.net/evalform/respondent-survey/' . $id;
+
+        $data['url'] = $url;
+
+        return view('qrcode', $data);
+    }
+
+    public function submitResponses($id)
+    {
+
+        $responses = new \App\Models\ResponsesModel();
+        $surveyModel = new \App\Models\SurveyModel();
+        $questionsModel = new \App\Models\QuestionsModel();
+
+        // Find the survey (you might need to adjust if your model's methods are different)
+        $survey = $surveyModel->find($id);
+
+        // Load questions for this survey
+        $questions = $questionsModel->where('survey_id', $survey['survey_id'])->findAll();
+
+        $postData = $this->request->getPost(); 
+
+        for ($i = 0; $i < count($questions); $i++) {
+            $responseText = null;
+
+            if (isset($postData['question_' . ($i + 1)])) { 
+                $responseText = $postData['question_' . ($i + 1)];  
+            } elseif (isset($postData['text_answer_' . ($i + 1)])) { 
+                $responseText = $postData['text_answer_' . ($i + 1)]; 
+            }
+
+            if ($responseText !== null) {
+                $responses->insert([ 
+                    'question_id' => $questions[$i]['question_id'], 
+                    'response' => $responseText 
+                ]);
+            }
+        }
+
+
+        return view('success');
+    }
 }
 
 
