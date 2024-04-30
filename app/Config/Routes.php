@@ -22,6 +22,8 @@ $routes->post('/view-surveys/deleteSurvey/(:num)','EvalformController::deleteSur
 $routes->post('/view-surveys/changeSurveyTitle','EvalformController::changeSurveyTitle');
 $routes->get('view-surveys/(:num)', 'EvalformController::viewSurvey/$1');
 $routes->get('view-surveys/(:num)/qrcode','EvalformController::getQRCodes/$1');
+$routes->get('view-surveys/responses/(:num)','EvalformController::viewResponses/$1');
+$routes->post('view-surveys/responses/(:num)/export','EvalformController::exportResponses/$1');
 
 $routes->group('admin', function($routes) {
     $routes->get('/', 'EvalformController::admin');

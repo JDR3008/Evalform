@@ -242,7 +242,6 @@ class EvalformController extends BaseController
 
     private function surveyViewer($id)
     {
-        // $userId = auth()->user()->id;
         $surveys = new \App\Models\SurveyModel();
         $questions = new \App\Models\QuestionsModel();
         $options = new \App\Models\OptionsModel();
@@ -286,11 +285,11 @@ class EvalformController extends BaseController
     {
 
         $responses = new \App\Models\ResponsesModel();
-        $surveyModel = new \App\Models\SurveyModel();
+        $surveys = new \App\Models\SurveyModel();
         $questionsModel = new \App\Models\QuestionsModel();
 
-        // Find the survey (you might need to adjust if your model's methods are different)
-        $survey = $surveyModel->find($id);
+        // Find the survey
+        $survey = $surveys->find($id);
 
         // Load questions for this survey
         $questions = $questionsModel->where('survey_id', $survey['survey_id'])->findAll();
@@ -306,7 +305,7 @@ class EvalformController extends BaseController
                 $responseText = $postData['text_answer_' . ($i + 1)]; 
             }
 
-            if ($responseText !== null) {
+            if ($responseText !== null && !empty($responseText)) {
                 $responses->insert([ 
                     'question_id' => $questions[$i]['question_id'], 
                     'response' => $responseText 
@@ -316,6 +315,53 @@ class EvalformController extends BaseController
 
 
         return view('success');
+    }
+
+    public function viewResponses($id)
+    {
+
+        $data = $this->surveyViewer($id);
+
+        $responses = new \App\Models\ResponsesModel();
+        $questionsModel = new \App\Models\QuestionsModel();
+
+        $allResponses = $responses->findAll();
+        $data['responses'] = $allResponses;
+
+
+        return view('viewResponses', $data);
+    }
+
+    public function exportResponses($id)
+    {
+        
+        $responses = new \App\Models\ResponsesModel();
+        $questionsModel = new \App\Models\QuestionsModel();
+
+
+        $questions = $questionsModel->where('survey_id', $id)->findAll();
+        $questionIds = array_column($questions, 'question_id'); 
+        $responses = $responses->whereIn('question_id', $questionIds)->findAll();
+
+
+        header('Content-Type: text/csv; charset=utf-8');
+		header('Content-Disposition: attachment; filename=responses-' . date("Y-m-d-h-i-s") . '.csv');
+        $output = fopen('php://output', 'w');
+
+        fputcsv($output, array('Id', 'Question ID', 'Response'));
+
+        
+        if (count($responses) > 0) {
+            foreach ($responses as $response) {
+                $response_row = [
+                    $response['response_id'],
+                    $response['question_id'],
+                    $response['response']
+                ];
+
+                fputcsv($output, $response_row);
+            }
+        }
     }
 }
 

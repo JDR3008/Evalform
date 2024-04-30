@@ -30,7 +30,10 @@
                             <form class="d-inline" action="<?= base_url('view-surveys/' . $survey['survey_id']); ?>" method="get">
                                 <button type="submit" class="btn btn-primary" >View Survey</button>
                             </form>
-                            <a href="responses.html" class="btn btn-secondary">View Data</a>
+
+                            <form class="d-inline" action="<?= base_url('view-surveys/responses/' . $survey['survey_id']); ?>" method="get">
+                                <button type="submit" class="btn btn-secondary" >View Data</button>
+                            </form>
                             
                             <form class="d-inline" action="<?= base_url('view-surveys/deleteSurvey/' . $survey['survey_id']); ?>" method="post">
                                 <button type="submit" class="btn btn-danger" ><i class="bi bi-trash"></i></button>
