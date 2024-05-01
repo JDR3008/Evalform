@@ -378,7 +378,7 @@ class EvalformController extends BaseController
 
         $surveys->insert($data);
 
-        return redirect()->back();  
+        return redirect()->to('view-surveys/' . $surveys->getInsertID() . '/edit-survey');  
     }
 
     public function addQuestion($id)

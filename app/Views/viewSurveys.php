@@ -23,7 +23,7 @@
 
                             </button> 
                         </div>
-                        <p class="card-text">Last Updated: <?= esc($survey['updated_at']) ?>.</p>
+                        <p class="card-text">Updated: <?= esc($survey['updated_at']) ?>.</p>
                         <div>
                             <form class="d-inline" action="<?= base_url('view-surveys/' . $survey['survey_id']); ?>" method="get">
                                 <button type="submit" class="btn btn-primary" >View Survey</button>
