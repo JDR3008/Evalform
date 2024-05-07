@@ -35,6 +35,7 @@ class EvalformController extends BaseController
         
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
+            $data['userType'] = 'user';
         }
 
         if (!is_null($user) && $user->inGroup('admin')) {
@@ -52,6 +53,7 @@ class EvalformController extends BaseController
 
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
+            $data['userType'] = 'user';
         }
 
         if (!is_null($user) && $user->inGroup('admin')) {
@@ -77,6 +79,7 @@ class EvalformController extends BaseController
 
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
+            $data['userType'] = 'admin';
         }
 
         if (!auth()->loggedIn()) {
@@ -230,7 +233,7 @@ class EvalformController extends BaseController
     public function respondentSurvey($id)
     {
         $data = $this->surveyViewer($id);
-        unset($data['name']);
+        unset($data['userType']);
 
         return view('respondentSurvey', $data);
     }
@@ -256,7 +259,7 @@ class EvalformController extends BaseController
         }
 
         $data = [
-            'name' => "filler",
+            'userType' => "user",
             'id' => $id,
             'title' => $survey['title'],
             'questions' => $surveyQuestions,
