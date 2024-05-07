@@ -1,3 +1,5 @@
+<!-- The code in this file utilises the pre-existing files from CodeIgniter4 Shield. -->
+
 <?= $this->extend(config('Auth')->views['layout']) ?>
 
 <?= $this->section('title') ?><?= lang('Auth.register') ?> <?= $this->endSection() ?>

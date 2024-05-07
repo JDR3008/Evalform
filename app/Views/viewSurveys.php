@@ -5,6 +5,8 @@
     <h1 class="text-center">Your Surveys</h1>
     <hr class="my-4">
 
+    <!-- This section of code iterates over the surveys for the current user that is logged in. It will then display them all on the socket_create_listen
+    The most recently edited/created one will be displayed first. -->
     <div class="row row-cols-md-4">
         <?php foreach ($surveys as $survey): ?>
             <div class="col-md-3 mb-3">
@@ -42,7 +44,8 @@
             </div>
         <?php endforeach; ?>
     </div>
-
+    
+    <!-- This modal is used to change the title (edit) the survey. -->
     <div class="modal fade" id="changeTitleModal" tabindex="-1" aria-labelledby="changeTitleLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -105,7 +108,7 @@
 </div>
 
   <script>
-       
+    //    This script is used to display the current title in the modal, so it can be edited
        var changeTitleModal = document.getElementById('changeTitleModal')
        changeTitleModal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget

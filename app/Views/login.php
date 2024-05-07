@@ -1,3 +1,5 @@
+<!-- The code in this file utilises the pre-existing files from CodeIgniter4 Shield. -->
+
 <?= $this->extend(config('Auth')->views['layout']) ?>
 
 <?= $this->section('title') ?><?= lang('Auth.login') ?> <?= $this->endSection() ?>
@@ -19,7 +21,6 @@
         margin: 0 auto; 
     }
 </style>
-
 
     <div class="container login-container">
         <h1 style="color: #007bff; margin: 20px;" >EvalForm</h1>

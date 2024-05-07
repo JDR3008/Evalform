@@ -1,3 +1,4 @@
+<!-- Extend the template -->
 <?= $this->extend('baseTemplate') ?>
 <?= $this->section('content') ?>
 
@@ -6,6 +7,6 @@ use chillerlan\QRCode\{QRCode, QROptions};
 
 $data = $url;
 
-// quick and simple:
+// Display QR Code on Screen
 echo '<img width=1024 src="'.(new QRCode)->render($data).'" alt="QR Code" />';
 ?>

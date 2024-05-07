@@ -1,3 +1,4 @@
+<!-- Extend the template -->
 <?= $this->extend('userTemplate') ?>
 <?= $this->section('content') ?>
 

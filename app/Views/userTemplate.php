@@ -1,7 +1,9 @@
+<!-- Extend the base template -->
 <?= $this->extend('baseTemplate') ?>
 <?= $this->section('content') ?>
 
-    <!-- Navbar for User -->
+    <!-- This section of the code is responsible for displaying the relevant information on the NavBar.
+    Depending on what user is logged in (i.e. user or admin), it will display different information -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <?php if (isset($userType)): ?>
@@ -20,6 +22,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
 
+                    <!-- If user is logged in, display the relevant pages on NavBar -->
                     <?php if (isset($userType)): ?>
                         <?php if ($userType == 'user'): ?>
                             <li class="nav-item">
@@ -32,7 +35,7 @@
                     <?php endif ?>
                 </ul>
                 
-                        
+                <!-- Sign In / Sign Out Section of Navbar -->
                 <ul class="navbar-nav ms-auto">
                     <?php if (isset($userType)): ?>
                         <li class="nav-item">

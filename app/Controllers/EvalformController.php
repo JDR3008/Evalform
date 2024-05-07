@@ -5,7 +5,7 @@ use CodeIgniter\Shield\Entities\User;
 
 class EvalformController extends BaseController
 {
-
+    // These are the cards that are to be displayed on the landing page of the website
     const CARDS = array(
         array(
             'title' => 'Create Surveys',
@@ -29,33 +29,45 @@ class EvalformController extends BaseController
         helper('url'); 
     }
 
+
+    // The index function is the landing page of the website.
+    // The cards are taken from the global array above
     public function index()
     {
+        // assign current user using shield
         $user = auth()->user();
         
+        // Check if user is logged in
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
             $data['userType'] = 'user';
         }
 
+        // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
             return redirect()->back();
         }
         
+        // Assign cards to data
         $data['cards'] = self::CARDS;
         return view('index', $data);
     }
 
+
+    // This viewSurvey function is the page which displays the user's surveys they currently have.
     public function viewSurveys()
     {
+        // assign current user using shield
         $user = auth()->user();
         $userId = $user->id;
 
+        // Check if user is logged in
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
             $data['userType'] = 'user';
         }
 
+        // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
             return redirect()->back();
         }
@@ -64,6 +76,7 @@ class EvalformController extends BaseController
 
         $surveys = $model->findAll();
 
+        // Assign relevant values and return them
         $data['surveys'] = $model
             ->orderBy('updated_at','DESC')
             ->where('user_id', $userId)
@@ -72,25 +85,30 @@ class EvalformController extends BaseController
         return view('viewSurveys', $data);
     }
 
+    // The admin function is the main function used for the admin view on the website
     public function admin()
     {
         $user = auth()->user();
         $data['cards'] = self::CARDS;
 
+        // Check if user is logged in
         if (auth()->loggedIn()) {
             $data['name'] = auth()->user()->username;
             $data['userType'] = 'admin';
         }
 
+
         if (!auth()->loggedIn()) {
             return redirect()->back();
         }
 
+        // If a user tries to access admin page, deny access
         if ($user->inGroup('user')) {
             session()->setFlashdata('error', 'You do not have the required permissions.');
             return redirect()->back(); 
         }
 
+        // Shield model
         $model = auth()->getProvider();
 
         // Fetch search query
@@ -130,22 +148,26 @@ class EvalformController extends BaseController
         return view('admin', $data);
     }
 
+    // Login page using shield
     public function login()
     {
         return view('login');
     }
 
+    // Register page using shield
     public function register()
     {
         return view('register');
     }
 
+    // This function will be accessed when the user clicks on change status on the admin page
     public function changeStatus($id)
     {
         $model = auth()->getProvider();
 
         $user = $model->findById($id);
 
+        // Determine whether currently active or not
         if ($user->active) {
             $user->deactivate();
         } else {
@@ -155,10 +177,12 @@ class EvalformController extends BaseController
         return redirect()->back();
     }
     
+    // This function is responsible for being able to add a user to the site from the admin page
     public function adduser()
     {
         $users = auth()->getProvider();
 
+        // Create new user using shield and post request from view
         $user = new User([
             'username' => $this->request->getPost('username'),
             'email'    => $this->request->getPost('email'),
@@ -166,17 +190,15 @@ class EvalformController extends BaseController
         ]);
         $users->save($user);
 
-        
-
         $user = $users->findById($users->getInsertID());
 
         $users->addToDefaultGroup($user);
         $user->activate();
 
-        return redirect()->back();
-        
+        return redirect()->back();   
     }
 
+    // This function is responsible for being able to edit a user to the site from the admin page
     public function edituser()
     {
         $users = auth()->getProvider();
@@ -185,11 +207,13 @@ class EvalformController extends BaseController
 
         $user = $users->findById($id);
 
+        // Edit a user using shield and the post request from view
         $fields = [
             'username' => $this->request->getPost('username'),
             'email'    => $this->request->getPost('email'),
         ];
 
+        // This section checks if the user has changed their password or not (since it is not displayed on the modal)
         if (!empty($this->request->getPost('password'))) {
             $fields["password"] = $this->request->getPost('password');
         }
@@ -199,10 +223,9 @@ class EvalformController extends BaseController
         $users->save($user);
 
         return redirect()->back(); 
-
-
     }
 
+    // The deleteSurvey function will use shield to delete a user from the user table
     public function deleteSurvey($id)
     {
         $model = new \App\Models\SurveyModel();
@@ -211,6 +234,7 @@ class EvalformController extends BaseController
         return redirect()->back();
     }
 
+    // The changeSurveyTitle function uses the survey model to change the title of a given survey
     public function changeSurveyTitle()
     {   
         $surveys = new \App\Models\SurveyModel();
@@ -223,34 +247,24 @@ class EvalformController extends BaseController
         
     }
 
-    public function viewSurvey($id)
-    {
-        $data = $this->surveyViewer($id);
-
-        return view('survey', $data);
-    }
-
-    public function respondentSurvey($id)
-    {
-        $data = $this->surveyViewer($id);
-        unset($data['userType']);
-
-        return view('respondentSurvey', $data);
-    }
-
+    // The surveyViewer function is utilised across numerous methods in this controller.
+    // It is used to get the questions and options for each question for the required survey.
     private function surveyViewer($id)
     {
+        // Access all the relevant tables
         $surveys = new \App\Models\SurveyModel();
         $questions = new \App\Models\QuestionsModel();
         $options = new \App\Models\OptionsModel();
 
         $survey = $surveys->find($id);
 
+        // Find all the questions that are in the survey
         $surveyQuestions = $questions
         ->where('survey_id', $id)->findAll();
 
         $questionIds = array_column($surveyQuestions, 'question_id');
 
+        // Find all the options for the quesations that are apart of the survey
         $optionsByQuestion = []; 
         foreach ($questionIds as $questionId) {
             $optionsByQuestion[$questionId] = $options
@@ -258,6 +272,7 @@ class EvalformController extends BaseController
                                     ->findAll();
         }
 
+        // Return the relevant data
         $data = [
             'userType' => "user",
             'id' => $id,
@@ -269,6 +284,27 @@ class EvalformController extends BaseController
         return $data;
     }
 
+
+    // This function gets the data from surveyViewer and returns it to the survey view
+    public function viewSurvey($id)
+    {
+        $data = $this->surveyViewer($id);
+
+        return view('survey', $data);
+    }
+
+    // This function gets the data from surveyViewer and returns it to the survey view
+    public function respondentSurvey($id)
+    {   
+        $data = $this->surveyViewer($id);
+        
+        // A respondent is not a user so this data is removed 
+        unset($data['userType']);
+
+        return view('respondentSurvey', $data);
+    }
+
+    // This function returns a QR code based off a get request to the QR code view
     public function getQRCodes($id)
     {
         
@@ -279,9 +315,12 @@ class EvalformController extends BaseController
         return view('qrcode', $data);
     }
 
+    // This function will process all the responses submitted by the respondent
+    // It then updates the tables in the database
     public function submitResponses($id)
     {
 
+        // Access all the relevant tables in the database
         $responses = new \App\Models\ResponsesModel();
         $surveys = new \App\Models\SurveyModel();
         $questionsModel = new \App\Models\QuestionsModel();
@@ -294,6 +333,8 @@ class EvalformController extends BaseController
 
         $postData = $this->request->getPost(); 
 
+
+        // Check whether the response is null or not. If there is data, it will then add it to the responses table
         for ($i = 0; $i < count($questions); $i++) {
             $responseText = null;
 
@@ -311,18 +352,23 @@ class EvalformController extends BaseController
             }
         }
 
-
+        // Return a success page after submit responses is clicked
         return view('success');
     }
 
+
+    // This function returns the viewResponses view and also returns the respondent data to the view
     public function viewResponses($id)
     {
 
+        // Get the data from the surveyViewer function in order to display the quesitons
         $data = $this->surveyViewer($id);
 
+        // Access the relevant tables
         $responses = new \App\Models\ResponsesModel();
         $questionsModel = new \App\Models\QuestionsModel();
 
+        // Pass all the responses to the view so they can be sorted depending on the question
         $allResponses = $responses->findAll();
         $data['responses'] = $allResponses;
 
@@ -330,9 +376,11 @@ class EvalformController extends BaseController
         return view('viewResponses', $data);
     }
 
+
+    // The function is what is responsible for exporting the responses for a given survey
     public function exportResponses($id)
     {
-        
+        // Access the relevant tables
         $responses = new \App\Models\ResponsesModel();
         $questionsModel = new \App\Models\QuestionsModel();
 
@@ -342,6 +390,7 @@ class EvalformController extends BaseController
         $responses = $responses->whereIn('question_id', $questionIds)->findAll();
 
 
+        // Convert the data in the tables into a .csv file. This file is then downloaded when the button is clicked.
         header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Disposition: attachment; filename=responses-' . date("Y-m-d-h-i-s") . '.csv');
         $output = fopen('php://output', 'w');
@@ -359,6 +408,7 @@ class EvalformController extends BaseController
         }
     }
 
+    // This function uses the surveyViewer method to display the survey on the edit survey view
     public function editSurvey($id)
     {
 
@@ -367,6 +417,8 @@ class EvalformController extends BaseController
         return view('editSurvey', $data);
     }
 
+    // This function gets the title of the new survey and inserts the new survey into the table
+    // This function also automatically re-directs the user to edit the new survey they have created.
     public function createSurvey()
     {
         $surveys = new \App\Models\SurveyModel();
@@ -384,22 +436,29 @@ class EvalformController extends BaseController
         return redirect()->to('view-surveys/' . $surveys->getInsertID() . '/edit-survey');  
     }
 
+
+    // This function allows for a question to be added on the edit survey page
     public function addQuestion($id)
-    {
+    {   
+
+        // Access the relevant tables
         $questions = new \App\Models\QuestionsModel();
         $options = new \App\Models\OptionsModel();
 
         $question = $this->request->getPost('question');
 
-        
-
+        // Get the data about the new question
         $questionData = [
             'survey_id' => $id,
             'question' => $question
         ];
 
+        // Insert into the question table
         $questions->insert($questionData);
 
+
+        // This section of the function checks if the new question has multiple choice answers or not
+        // If it does not, it is ignored, if it does, it will insert them into the options table
         for ($i = 0; $i < 4; $i++) {
             if (!empty($this->request->getPost('option' . ($i + 1)))) {
                 $optionsData['question_id'] = $questions->getInsertID();
@@ -411,11 +470,14 @@ class EvalformController extends BaseController
         return redirect()->to('view-surveys/' . $id . '/edit-survey');
     }
 
+
+    // This function accesses the questions table and will delete the question if the delete button is clicked
     public function deleteQuestion($id)
     {
 
         $questionId = $this->request->getPost('question_id');  
 
+        // Delete question from table
         $model = new \App\Models\QuestionsModel();
         $model->delete($questionId);
 

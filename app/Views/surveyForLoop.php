@@ -1,3 +1,5 @@
+<!-- This section will be included in multiple views on the website. 
+It is responsible for displaying the questions and their respective options. -->
 <?php for ($i = 0; $i < count($questions); $i++): ?>
     <h2>Question <?= $i + 1 ?> </h2>
     <p><?= $questions[$i]['question'] ?></p> 

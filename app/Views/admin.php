@@ -1,53 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvalForm | Admin</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-    /* Custom styles for elements */
-        footer {
-            background-color: #343a40;
-            color: #ffffff;
-            padding: 20px 0;
-        }
+<!-- Extend the template -->
+<?= $this->extend('userTemplate') ?>
+<?= $this->section('content') ?>
 
-        .page-container {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            min-height: 100vh;
-        }
-
-        @media (max-width: 575px) {
-            .table-container {
-                max-width: 100vw;
-            }
-        }
-    </style>
-</head>
-<body class="page-container">
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">EvalForm Admin</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <!-- Sign Out option -->
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('logout')?>">Sign Out</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Table of users -->
     <section class="py-5">
         <div class="container table-container">
         <h1 style="margin-bottom: 40px;">Hello, <?= esc($name) ?>!</h1>
@@ -56,6 +10,8 @@
             </div>
             <div class="row mb-4">
                 <div class="col-md-6">
+
+                    <!-- A get request is sent for when the search button is clicked -->
                     <form method="get" action="<?= base_url('admin/'); ?>">
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Search..." name="search">
@@ -68,7 +24,8 @@
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
                 </div>
             </div>
-            <!-- Enter pre-written data -->
+
+            <!-- Create a table which displays all the users so admins can view them -->
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
@@ -82,6 +39,8 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
+
+                    <!-- Use a foreach loop to iterate over the users returned from the controller. This then inserts them in the table -->
                     <tbody>
                         <?php foreach ($users as $user): ?>
                             <tr>
@@ -129,7 +88,7 @@
     </section>
 
     <!-- This section allows a pop-up menu to add a user -->
-    <!-- Note that, it will automatically enter the user unique ID number (default set to three for mock up) -->
+    <!-- Note that, it will automatically enter the user unique ID number -->
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -161,7 +120,8 @@
         </div>
     </div>
 
-
+    <!-- This section allows a pop-up menu to edit a user -->
+    <!-- Note that, it will automatically enter the user unique ID number (this value is readonly and cannot be edited) -->
     <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -197,20 +157,9 @@
         </div>
     </div>
 
-
-
-    <!-- Footer -->
-    <footer class="text-center">
-        <div class="container">
-            <p class="mb-0">&copy; <?= date('Y') ?> EvalForm</p>
-        </div>
-    </footer>
-    
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
        
+    // This section is responsible for loading the data into the modal when editing a user
        var editUserModal = document.getElementById('editUserModal')
        editUserModal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget
@@ -231,6 +180,6 @@
        });
 
     </script>
-</body>
-</html>
+
+<?= $this->endSection() ?>
 
