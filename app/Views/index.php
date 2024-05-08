@@ -6,17 +6,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
-                    
-                    <!-- This section will check if a user has attemptedf to enter the admin page. If so, it will throw an error and say they are not permitted -->
-                    <?php if (session()->has('error')): ?>
-                        <div class="alert alert-danger" id="flash-message"><?= session('error') ?></div>
-                        <script>
-                            setTimeout(function() {
-                                document.getElementById('flash-message').style.display = 'none';
-                            }, 4000); 
-                        </script>
-                    <?php endif; ?>
-
                     <!-- This section will check if a user is logged in, if so then it will display different text to the landing page -->
                     <?php if (isset($name)): ?>
                         <h1 class="typed-out">Hello, <?= esc($name) ?>!</h1>

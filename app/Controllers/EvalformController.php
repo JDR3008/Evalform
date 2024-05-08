@@ -104,7 +104,7 @@ class EvalformController extends BaseController
 
         // If a user tries to access admin page, deny access
         if ($user->inGroup('user')) {
-            session()->setFlashdata('error', 'You do not have the required permissions.');
+            session()->setFlashdata('error', 'Users cannot access the admin page.');
             return redirect()->back(); 
         }
 
