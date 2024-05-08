@@ -39,7 +39,7 @@
                 <ul class="navbar-nav ms-auto">
                     <?php if (isset($userType)): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('logout')?>">Sign Out</a>
+                            <a style="cursor:pointer;" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal">Sign Out</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
@@ -57,6 +57,27 @@
         <?= $this->renderSection('content') ?> 
 
     </main>
+    
+    <!-- This modal is used to ask whether the user wishes to log out or not -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logout">Log Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to log out?
+                    <form id="logout" action="<?= base_url('logout'); ?>" method="get">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="text-center">

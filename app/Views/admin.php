@@ -60,9 +60,9 @@
                                     <div class="d-flex">
                                         <button class="btn btn-sm btn-primary me-2 edit-user-btn" 
                                             data-bs-toggle="modal" data-bs-target="#editUserModal"
-                                            data-user-id="<?= $user->id ?>" 
-                                            data-email="<?= $user->secret ?>"
-                                            data-username="<?= $user->username ?>">
+                                            data-user-id="<?= esc($user->id) ?>" 
+                                            data-email="<?= esc($user->secret) ?>"
+                                            data-username="<?= esc($user->username) ?>">
                                             Edit
                                         </button>
 

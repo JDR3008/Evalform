@@ -33,7 +33,7 @@ min-height: 100vh;
     }
 }
 
-.table-responsive{
+.table-responsiveness{
     max-height: clamp(10em,10vh,250px);
     overflow: auto;
 }

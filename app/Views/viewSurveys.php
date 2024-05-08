@@ -35,14 +35,43 @@
                                 <button type="submit" class="btn btn-secondary" >View Data</button>
                             </form>
                             
-                            <form class="d-inline" action="<?= base_url('view-surveys/deleteSurvey/' . $survey['survey_id']); ?>" method="post">
-                                <button type="submit" class="btn btn-danger" ><i class="bi bi-trash"></i></button>
-                            </form>
+
+                            <button data-bs-toggle="modal" 
+                                data-survey-id="<?= esc($survey['survey_id']) ?>"
+                                data-survey-title="<?= esc($survey['title']) ?>"
+                                data-bs-target="#deleteSurveyModal" 
+                                class="btn btn-danger" >
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         <?php endforeach; ?>
+    </div>
+    
+    <!-- This modal is used for asking whether users wish to delete their survey or not -->
+    <div class="modal fade" id="deleteSurveyModal" tabindex="-1" aria-labelledby="deleteSurveyModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSurvey">Delete Survey</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this survey?
+                    <form action="<?= base_url('view-surveys/deleteSurvey') ?>" method="post">
+                        <div class="mb-3">
+                            <input type="hidden" class="form-control" id="id" name="survey_id">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- This modal is used to change the title (edit) the survey. -->
@@ -111,18 +140,36 @@
     //    This script is used to display the current title in the modal, so it can be edited
        var changeTitleModal = document.getElementById('changeTitleModal')
        changeTitleModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget
-        var id = button.getAttribute('data-survey-id')
+            var button = event.relatedTarget
+            var id = button.getAttribute('data-survey-id')
 
-        var title = button.getAttribute('data-survey-title')
+            var title = button.getAttribute('data-survey-title')
 
-        var idInput = changeTitleModal.querySelector('.modal-body input[name=survey_id]')
-        var titleInput = changeTitleModal.querySelector('.modal-body input[name=title]')
-        
-        idInput.value = id
-        titleInput.value = title
-       });
+            var idInput = changeTitleModal.querySelector('.modal-body input[name=survey_id]')
+            var titleInput = changeTitleModal.querySelector('.modal-body input[name=title]')
+            
+            idInput.value = id
+            titleInput.value = title
+        });
 
+    </script>
+
+    
+    <script>
+        // This script is used to retrieve the id of the survey so it can be deleted in the controller
+        var deleteSurveyModal = document.getElementById('deleteSurveyModal')
+        deleteSurveyModal.addEventListener('show.bs.modal', function (event) {
+            var button2 = event.relatedTarget
+            var id = button2.getAttribute('data-survey-id')
+            var title = button2.getAttribute('data-survey-title')
+
+            var idInput = deleteSurveyModal.querySelector('.modal-body input[name=survey_id]')
+            var modalTitle = deleteSurveyModal.querySelector('.modal-title')
+            
+            idInput.value = id
+            modalTitle.textContent = "Delete " + title
+        });
+    
     </script>
 
   <?= $this->endSection() ?>

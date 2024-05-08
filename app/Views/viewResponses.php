@@ -34,8 +34,8 @@
             <h4>Responses</h4>
             
             <?php if (!empty($questionResponses)): ?> 
-                <div class="table-responsive"> 
-                    <table class="table table-striped table-bordered table-hover table-responsive">
+                <div class="table-responsive table-responsiveness"> 
+                    <table class="table table-striped table-bordered table-hover">
                         <thead class="sticky-top bg-white">
                             <tr>
                                 <th>Response ID</th>

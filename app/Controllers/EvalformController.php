@@ -123,15 +123,10 @@ class EvalformController extends BaseController
 
         // Apply search filter if search query is provided
         if (!empty($search)) {
-            $conditions = [];
 
             foreach ($searchableColumns as $column) {
-                $conditions[] = $column . " LIKE '%$search%'";
+                $model->orLike($column, $search);
             }
-
-            $whereClause = implode(' OR ', $conditions);
-
-            $model->where($whereClause);
         }
 
         // Paginate the results
@@ -226,9 +221,12 @@ class EvalformController extends BaseController
     }
 
     // The deleteSurvey function will use shield to delete a user from the user table
-    public function deleteSurvey($id)
+    public function deleteSurvey()
     {
         $model = new \App\Models\SurveyModel();
+        
+        $id = $this->request->getPost();
+        
         $model->delete($id);
 
         return redirect()->back();

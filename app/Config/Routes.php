@@ -26,7 +26,7 @@ $routes->post('/respondent-survey/(:num)/submitResponses','EvalformController::s
 $routes->get('/view-surveys', 'EvalformController::viewSurveys');
 
 // Delete survey post request
-$routes->post('/view-surveys/deleteSurvey/(:num)','EvalformController::deleteSurvey/$1');
+$routes->post('/view-surveys/deleteSurvey','EvalformController::deleteSurvey');
 
 // Change survey title post request
 $routes->post('/view-surveys/changeSurveyTitle','EvalformController::changeSurveyTitle');
