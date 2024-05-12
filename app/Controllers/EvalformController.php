@@ -348,6 +348,7 @@ class EvalformController extends BaseController
 
         $user = auth()->user();
         
+        // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
             return redirect()->back();
         }
@@ -384,10 +385,10 @@ class EvalformController extends BaseController
 
         $user = auth()->user();
         
+        // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
             return redirect()->back();
         }
-
         return view('qrcode', $data);
     }
 
@@ -450,6 +451,7 @@ class EvalformController extends BaseController
 
         $user = auth()->user();
         
+        // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
             return redirect()->back();
         }
@@ -496,6 +498,9 @@ class EvalformController extends BaseController
 
         $data = $this->surveyViewer($id);
 
+        $user = auth()->user();
+
+        // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
             return redirect()->back();
         }
