@@ -115,11 +115,11 @@ class EvalformController extends BaseController
         $search = $this->request->getGet('search');
 
         $model
-            ->select('users.id, users.username, auth_groups_users.group, auth_identities.secret, users.active, users.updated_at')
+            ->select('users.id, users.username, auth_groups_users.group, auth_identities.secret, users.status, users.updated_at')
             ->join('auth_groups_users', 'users.id = auth_groups_users.user_id', 'inner')
             ->join('auth_identities', 'users.id = auth_identities.user_id', 'inner');
 
-        $searchableColumns = ['users.id', 'users.username', 'auth_groups_users.group', 'auth_identities.secret', 'users.active', 'users.updated_at'];
+        $searchableColumns = ['users.id', 'users.username', 'auth_groups_users.group', 'auth_identities.secret', 'users.status', 'users.updated_at'];
 
         // Apply search filter if search query is provided
         if (!empty($search)) {
@@ -163,34 +163,67 @@ class EvalformController extends BaseController
         $user = $model->findById($id);
 
         // Determine whether currently active or not
-        if ($user->active) {
-            $user->deactivate();
+        if ($user->isBanned()) {
+            $user->unBan();
         } else {
-            $user->activate();
+            $user->ban('This user is currently archived.');
         } 
 
         return redirect()->back();
     }
-    
-    // This function is responsible for being able to add a user to the site from the admin page
+
     public function adduser()
     {
         $users = auth()->getProvider();
 
-        // Create new user using shield and post request from view
-        $user = new User([
+        $fields = [
             'username' => $this->request->getPost('username'),
             'email'    => $this->request->getPost('email'),
             'password' => $this->request->getPost('password'),
-        ]);
-        $users->save($user);
+        ];
 
+        // Check if all fields are filled
+        foreach ($fields as $field => $value) {
+            if (empty($value)) {
+                session()->setFlashdata('error', 'All fields are required to create a user.');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        // Check uniqueness
+        $usernameExists = $users->where('username', $fields['username'])
+                        ->countAllResults() > 0;
+
+        $emailExists = $users->where('secret', $fields['email'])
+                        ->join('auth_identities', 'users.id = auth_identities.user_id', 'inner')
+                        ->countAllResults() > 0;
+
+        // Display specific error messages if the data is not correct
+        if ($usernameExists) {
+            session()->setFlashdata('error', 'The username is already taken.');
+            return redirect()->back()->withInput();
+        }
+
+        if ($emailExists) {
+            session()->setFlashdata('error', 'The email address is already in use.');
+            return redirect()->back()->withInput();
+        }
+
+        // Create and save the user
+        $user = new User($fields);
+        if (!$users->save($user)) {
+            // Handle other validation errors (if any)
+            session()->setFlashdata('error', 'There was an error creating the user.');
+            return redirect()->back()->withInput();
+        }
+
+        // Get the newly created user's ID and perform additional actions
         $user = $users->findById($users->getInsertID());
-
         $users->addToDefaultGroup($user);
         $user->activate();
 
-        return redirect()->back();   
+        session()->setFlashdata('success', 'User created successfully!');
+        return redirect()->back();
     }
 
     // This function is responsible for being able to edit a user to the site from the admin page
@@ -213,9 +246,34 @@ class EvalformController extends BaseController
             $fields["password"] = $this->request->getPost('password');
         }
 
-        $user->fill($fields);
+        // Check whether the username and email are unique
+        $usernameExists = $users->where('username', $fields['username'])
+                       ->countAllResults() > 0;
 
-        $users->save($user);
+        $emailExists = $users->where('secret', $fields['email'])
+                     ->join('auth_identities', 'users.id = auth_identities.user_id', 'inner')
+                     ->countAllResults() > 0;
+
+        // Display specific error messages if the data is not correct
+        if ($usernameExists) {
+            session()->setFlashdata('error', 'The username is already taken.');
+            return redirect()->back()->withInput();
+        }
+
+        if ($emailExists) {
+            session()->setFlashdata('error', 'The email address is already in use.');
+            return redirect()->back()->withInput();
+        }
+
+        // If username and email are unique then save the data
+        if (!$user->fill($fields) || !$users->save($user)) {
+            
+            // Handle other validation errors (if any)
+            session()->setFlashdata('error', 'There was an error updating the user.');
+            return redirect()->back()->withInput();
+        }
+
+        session()->setFlashdata('success', 'User updated successfully!');
 
         return redirect()->back(); 
     }
@@ -288,6 +346,12 @@ class EvalformController extends BaseController
     {
         $data = $this->surveyViewer($id);
 
+        $user = auth()->user();
+        
+        if (!is_null($user) && $user->inGroup('admin')) {
+            return redirect()->back();
+        }
+
         return view('survey', $data);
     }
 
@@ -295,9 +359,17 @@ class EvalformController extends BaseController
     public function respondentSurvey($id)
     {   
         $data = $this->surveyViewer($id);
+
+        $user = auth()->user();
+        
+        if (!is_null($user)) {
+            return redirect()->back();
+        }
         
         // A respondent is not a user so this data is removed 
         unset($data['userType']);
+
+        
 
         return view('respondentSurvey', $data);
     }
@@ -309,6 +381,12 @@ class EvalformController extends BaseController
         $url = 'https://infs3202-42fc98bb.uqcloud.net/evalform/respondent-survey/' . $id;
 
         $data['url'] = $url;
+
+        $user = auth()->user();
+        
+        if (!is_null($user) && $user->inGroup('admin')) {
+            return redirect()->back();
+        }
 
         return view('qrcode', $data);
     }
@@ -370,6 +448,12 @@ class EvalformController extends BaseController
         $allResponses = $responses->findAll();
         $data['responses'] = $allResponses;
 
+        $user = auth()->user();
+        
+        if (!is_null($user) && $user->inGroup('admin')) {
+            return redirect()->back();
+        }
+
 
         return view('viewResponses', $data);
     }
@@ -411,6 +495,10 @@ class EvalformController extends BaseController
     {
 
         $data = $this->surveyViewer($id);
+
+        if (!is_null($user) && $user->inGroup('admin')) {
+            return redirect()->back();
+        }
 
         return view('editSurvey', $data);
     }

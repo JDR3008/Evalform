@@ -25,6 +25,18 @@
                 </div>
             </div>
 
+            <?php if (session()->has('error')): ?>
+                <div class="alert alert-danger">
+                    <?= session('error') ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (session()->has('success')): ?>
+                <div class="alert alert-success">
+                    <?= session('success') ?>
+                </div>
+            <?php endif; ?>
+
             <!-- Create a table which displays all the users so admins can view them -->
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -50,10 +62,10 @@
                                 <td><?= esc($user->secret) ?></td>
                                 <td><?= esc($user->updated_at) ?></td>
 
-                                <?php if ($user->active): ?>
-                                    <td style="color: white" class="bg-success">Active</td>
-                                <?php else: ?>
+                                <?php if ($user->isBanned()): ?>
                                     <td style="color: white" class="bg-danger">Inactive</td>
+                                <?php else: ?>
+                                    <td style="color: white" class="bg-success">Active</td>
                                 <?php endif ?>
 
                                 <td>

@@ -54,14 +54,19 @@
 
     <main>
         <!-- This will display an error message if a user tries to access the admin page -->
-        <?php if (session()->has('error')): ?>
-            <div class="alert alert-danger" id="flash-message"><?= session('error') ?></div>
-            <script>
-                setTimeout(function() {
-                    document.getElementById('flash-message').style.display = 'none';
-                }, 4000); 
-            </script>
-        <?php endif; ?>
+        <?php if (isset($userType)): ?>
+            <?php if ($userType == 'user'): ?>
+                <?php if (session()->has('error')): ?>
+                    <div class="alert alert-danger" id="flash-message"><?= session('error') ?></div>
+                    <script>
+                        setTimeout(function() {
+                            document.getElementById('flash-message').style.display = 'none';
+                        }, 4000); 
+                    </script>
+                <?php endif; ?>
+            <?php endif ?>
+        <?php endif ?>
+        
         <!-- Unique page content -->
         <?= $this->renderSection('content') ?> 
 
