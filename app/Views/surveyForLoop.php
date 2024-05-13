@@ -2,13 +2,13 @@
 It is responsible for displaying the questions and their respective options. -->
 <?php for ($i = 0; $i < count($questions); $i++): ?>
     <h2>Question <?= $i + 1 ?> </h2>
-    <p><?= $questions[$i]['question'] ?></p> 
+    <p><?= esc($questions[$i]['question']) ?></p> 
 
     <?php if (!empty($options[$questions[$i]['question_id']])): ?> 
         <?php foreach ($options[$questions[$i]['question_id']] as $option): ?>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="question_<?= $i + 1 ?>" id="option_<?= $option['option_id'] ?>" value="<?= $option['option_text'] ?>"> 
-                <label class="form-check-label" for="option_<?= $option['option_id'] ?>"><?= $option['option_text'] ?></label>
+                <input class="form-check-input" type="radio" name="question_<?= $i + 1 ?>" id="option_<?= esc($option['option_id']) ?>" value="<?= esc($option['option_text']) ?>"> 
+                <label class="form-check-label" for="option_<?= esc($option['option_id']) ?>"><?= esc($option['option_text']) ?></label>
             </div>
         <?php endforeach; ?>
 

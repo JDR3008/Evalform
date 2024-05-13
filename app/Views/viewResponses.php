@@ -9,7 +9,7 @@
         <!-- This section of the code displays the questions and the relevant multiple choice options -->
         <?php for ($i = 0; $i < count($questions); $i++): ?>
             <h2>Question <?= $i + 1 ?> </h2>
-            <p><?= $questions[$i]['question'] ?></p> 
+            <p><?= esc($questions[$i]['question']) ?></p> 
 
             <?php $questionResponses = array_filter($responses, function($response) use ($questions, $i) {
                 return $response['question_id'] == $questions[$i]['question_id'];
@@ -18,8 +18,8 @@
             <?php if (!empty($options[$questions[$i]['question_id']])): ?> 
                 <?php foreach ($options[$questions[$i]['question_id']] as $option): ?>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="question_<?= $i + 1 ?>" id="option_<?= $option['option_id'] ?>" value="<?= $option['option_text'] ?>"> 
-                        <label class="form-check-label" for="option_<?= $option['option_id'] ?>"><?= $option['option_text'] ?></label>
+                        <input class="form-check-input" type="radio" name="question_<?= $i + 1 ?>" id="option_<?= esc($option['option_id']) ?>" value="<?= esc($option['option_text']) ?>"> 
+                        <label class="form-check-label" for="option_<?= esc($option['option_id']) ?>"><?= esc($option['option_text']) ?></label>
                     </div>
                 <?php endforeach; ?>
 
@@ -46,8 +46,8 @@
                             <?php foreach ($responses as $response): ?>
                                 <?php if ($response['question_id'] == $questions[$i]['question_id']): ?> 
                                     <tr>
-                                        <td><?= $response['response_id'] ?></td>
-                                        <td><?= $response['response'] ?></td>
+                                        <td><?= esc($response['response_id']) ?></td>
+                                        <td><?= esc($response['response']) ?></td>
                                     </tr>
                                 <?php endif; ?> 
                             <?php endforeach; ?> 
@@ -58,7 +58,7 @@
                 <!-- This section checks whether the question is multiple choice. If it is, it will generate a doughnut diagram using Chart.js -->
                 <?php if (!empty($options[$questions[$i]['question_id']])): ?> 
                     <div id="chart-container-<?= $questions[$i]['question_id'] ?>" style="width: 50%; height: 50%; margin:auto;">
-                        <canvas id="questionChart-<?= $questions[$i]['question_id'] ?>"></canvas>
+                        <canvas id="questionChart-<?= esc($questions[$i]['question_id']) ?>"></canvas>
                     </div>
 
 

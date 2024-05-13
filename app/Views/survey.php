@@ -8,7 +8,7 @@
     <hr class="my-4">
 
     <!-- Include the surveyForLoop which displays the questions for that survey -->
-    <?php include('surveyForLoop.php')?>
+    <?= $this->include('surveyForLoop')?>
 
     <!-- This section of the code is responsible for creating the buttons which will link to certain parts of the website -->
     <div class="text-center">

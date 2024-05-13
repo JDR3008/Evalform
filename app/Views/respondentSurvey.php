@@ -9,7 +9,7 @@
         <!-- This form will submit the responses that are selected by the respondent, and sent them to the controller -->
         <form action="<?= base_url('respondent-survey/' . $id . '/submitResponses') ?>" method="post">
             <!-- Include the surveyForLoop which displays the questions for that survey -->
-            <?php include('surveyForLoop.php')?>
+            <?= $this->include('surveyForLoop')?>
         
             <div class="text-center">
                 <button type="submit" class="btn btn-outline-success btn-lg" style="width: 100%;">
