@@ -37,8 +37,7 @@ class EvalformController extends BaseController
      * The index function is the landing page of the website.
      * The cards are taken from the global array above
      * 
-     * @return view index - The function will return the index view
-     * @return array $data - The relevant data to be displayed on the page
+     * @return view - The function will return a view and the data for the page
      */ 
     public function index()
     {
@@ -65,8 +64,7 @@ class EvalformController extends BaseController
     /**
      * This viewSurvey function is the page which displays the user's surveys they currently have.
      * 
-     * @return view viewSurveys - The function will return the view surveys view
-     * @return array $data - The relevant data to be displayed on the page
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function viewSurveys()
     {
@@ -102,8 +100,7 @@ class EvalformController extends BaseController
     /**
      * The admin function is the main function used for the admin view on the website
      * 
-     * @return view admin - The function will return the admin view
-     * @return array $data - The relevant user data to be displayed on the page
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function admin()
     {
@@ -166,7 +163,7 @@ class EvalformController extends BaseController
     /**
      * Login page using shield
      * 
-     * @return view login - The function will return the login view
+     * @return view - The function will return the login view
      *  */ 
     public function login()
     {
@@ -177,7 +174,7 @@ class EvalformController extends BaseController
     /**
      * Register page using shield
      * 
-     * @return view register - The function will return the register view
+     * @return view - The function will return the register view
      *  */ 
     public function register()
     {
@@ -190,7 +187,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - The user id that status is being changed
      * 
-     * @return view admin - The function will return back to the admin page using the back command
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function changeStatus($id)
     {
@@ -214,7 +211,7 @@ class EvalformController extends BaseController
      * Its main challenge is validating the new user. It does so by checking if the username and email are unique
      * It will raise an error and display it if not valid, otherwise, a confirmation message will be displayed to the admin
      * 
-     * @return view admin - The function will return back to the admin page using the back command
+     * @return view - The function will return back to the admin page using the back command
      *  */
     public function adduser()
     {
@@ -276,7 +273,7 @@ class EvalformController extends BaseController
      * Its main challenge is validating the changes to the user. It does so by checking if the username and email are unique
      * It will raise an error and display it if not valid, otherwise, a confirmation message will be displayed to the admin
      * 
-     * @return view admin - The function will return back to the admin page using the back command
+     * @return view - The function will return back to the admin page using the back command
      *  */
     public function edituser()
     {
@@ -299,11 +296,11 @@ class EvalformController extends BaseController
 
         // Check whether the username and email are unique
         $usernameExists = $users->where('username', $fields['username'])
-                       ->countAllResults() > 0;
+                       ->countAllResults() > 1;
 
         $emailExists = $users->where('secret', $fields['email'])
                      ->join('auth_identities', 'users.id = auth_identities.user_id', 'inner')
-                     ->countAllResults() > 0;
+                     ->countAllResults() > 1;
 
         // Display specific error messages if the data is not correct
         if ($usernameExists) {
@@ -333,7 +330,7 @@ class EvalformController extends BaseController
     /** 
      * The deleteSurvey function will use the survey model to delete a survey from the database
      * 
-     * @return view viewSurveys - This function will return to the view surveys page.
+     * @return view - This function will return to the view surveys page.
      *  */ 
     public function deleteSurvey()
     {
@@ -350,7 +347,7 @@ class EvalformController extends BaseController
     /**
      * The changeSurveyTitle function uses the survey model to change the title of a given survey
      * 
-     * @return view viewSurveys - This function will return to the view surveys page.
+     * @return view - This function will return to the view surveys page.
      *  */ 
     public function changeSurveyTitle()
     {   
@@ -371,20 +368,35 @@ class EvalformController extends BaseController
      * 
      * @param int $id - The id of the survey that is being displayed
      * 
-     * @return array $data - The survey data (questions and options for each question in the given survey)
+     * @return array - The survey data (questions and options for each question in the given survey)
      *  */ 
     private function surveyViewer($id)
-    {
+    {   
         // Access all the relevant tables
         $surveys = new \App\Models\SurveyModel();
         $questions = new \App\Models\QuestionsModel();
         $options = new \App\Models\OptionsModel();
 
+        $userId = auth()->user()->id;
+
+        // This section will validate whether the survey shown belongs to the user
+        $validSurveys = $surveys
+                ->select('surveys.survey_id')
+                ->where('surveys.user_id', $userId)
+                ->where('surveys.survey_id', $id)
+                ->first();
+
+        // If survey is invalid then return a false validation
+        if (is_null($validSurveys)) {
+            $data['surveyValid'] = false;
+            return $data;
+        }
+
         $survey = $surveys->find($id);
 
         // Find all the questions that are in the survey
         $surveyQuestions = $questions
-        ->where('survey_id', $id)->findAll();
+                ->where('survey_id', $id)->findAll();
 
         $questionIds = array_column($surveyQuestions, 'question_id');
 
@@ -392,13 +404,14 @@ class EvalformController extends BaseController
         $optionsByQuestion = []; 
         foreach ($questionIds as $questionId) {
             $optionsByQuestion[$questionId] = $options
-                                    ->where('question_id', $questionId)
-                                    ->findAll();
+                    ->where('question_id', $questionId)
+                    ->findAll();
         }
 
         // Return the relevant data
         $data = [
             'userType' => "user",
+            'surveyValid' => true,
             'id' => $id,
             'title' => $survey['title'],
             'questions' => $surveyQuestions,
@@ -414,12 +427,15 @@ class EvalformController extends BaseController
      * 
      * @param int $id - The id of the survey that is being displayed 
      * 
-     * @return view survey - The survey view is returned by the function
-     * @return array $data - The survey data (from surveyViewer) 
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function viewSurvey($id)
     {
         $data = $this->surveyViewer($id);
+
+        if (!$data['surveyValid']) {
+            return redirect()->back();
+        }
 
         $user = auth()->user();
         
@@ -437,8 +453,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - The id of the survey that is being displayed 
      * 
-     * @return view respondentSurvey - The respondent survey view is returned by the function
-     * @return array $data - The survey data (from surveyViewer) 
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function respondentSurvey($id)
     {   
@@ -453,8 +468,6 @@ class EvalformController extends BaseController
         // A respondent is not a user so this data is removed 
         unset($data['userType']);
 
-        
-
         return view('respondentSurvey', $data);
     }
 
@@ -464,8 +477,7 @@ class EvalformController extends BaseController
      * 
      * @param $id - The id of the survey that the QR code is being generated for
      * 
-     * @return view qrcode - The QR code view
-     * @return array $data - The URL that will be linked to the QR code
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function getQRCodes($id)
     {
@@ -490,7 +502,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - the id of the survey that the respondent has just completed
      * 
-     * @return view success - A success page that informs the responent they have been successful
+     * @return view - A success page that informs the responent they have been successful
      *  */ 
     public function submitResponses($id)
     {
@@ -538,8 +550,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - the id of the survey that is being displayed on the page
      * 
-     * @return view viewResponses - the view responses page that a user can view for their survey
-     * @return array $data - The survey questions and options, alongside the response data
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function viewResponses($id)
     {
@@ -550,6 +561,10 @@ class EvalformController extends BaseController
         // Access the relevant tables
         $responses = new \App\Models\ResponsesModel();
         $questionsModel = new \App\Models\QuestionsModel();
+
+        if (!$data['surveyValid']) {
+            return redirect()->back();
+        }
 
         // Pass all the responses to the view so they can be sorted depending on the question
         $allResponses = $responses->findAll();
@@ -610,8 +625,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - The id of the survey that is being displayed on the edit survey page
      * 
-     * @return view editSurvey - the edit survey view is returned by the function
-     * @return array $data - The survey data from surveyViewer
+     * @return view - The function will return a view and the data for the page
      *  */ 
     public function editSurvey($id)
     {
@@ -619,6 +633,10 @@ class EvalformController extends BaseController
         $data = $this->surveyViewer($id);
 
         $user = auth()->user();
+
+        if (!$data['surveyValid']) {
+            return redirect()->back();
+        }
 
         // re-direct user if they are not permitted
         if (!is_null($user) && $user->inGroup('admin')) {
@@ -633,7 +651,7 @@ class EvalformController extends BaseController
      * This function gets the title of the new survey and inserts the new survey into the table
      * This function also automatically re-directs the user to edit the new survey they have created.
      * 
-     * @return view editSurvey - This function will go back to the edit survey page for the specific survey they have just created
+     * @return view - This function will go to the edit survey page for the specific survey they have just created
      *  */ 
     public function createSurvey()
     {
@@ -658,7 +676,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - The id of the survey that the new question is being added to
      * 
-     * @return view editSurvey - This function will  re-direct back to the edit survey view that is was already on prior to the post request
+     * @return view - This function will  re-direct back to the edit survey view that is was already on prior to the post request
      *  */ 
     public function addQuestion($id)
     {   
@@ -698,7 +716,7 @@ class EvalformController extends BaseController
      * 
      * @param int $id - the id of the survey that the question is being deleted from
      * 
-     * @return view editSurvey - This function will  re-direct back to the edit survey view that is was already on prior to the post request
+     * @return view - This function will  re-direct back to the edit survey view that is was already on prior to the post request
      *  */ 
     public function deleteQuestion($id)
     {
