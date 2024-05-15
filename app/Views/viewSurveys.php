@@ -11,19 +11,24 @@
         <?php foreach ($surveys as $survey): ?>
             <div class="col-md-3 mb-3">
                 <div class="card">
-                    <img src="images/survey-image.jpg" class="card-img-top" alt="Survey 1 Image">
+                    <img src="images/survey-image.jpg" class="card-img-top" alt="Survey Image">
                     <div class="card-body p-3">
                         
-                        <div class="d-flex">
-                            <h5 class="card-title me-1"><?= esc($survey['title']) ?></h5> 
-                            <button 
-                                class="btn btn-sm btn-primary"
-                                data-bs-toggle="modal" data-bs-target="#changeTitleModal"
-                                data-survey-id="<?= esc($survey['survey_id']) ?>"
-                                data-survey-title="<?= esc($survey['title']) ?>">
-                                <i class="bi bi-pencil"></i>
+                        <div class="row cols-md-2">
+                        
+                            <div class="col">
+                                <h4 class="card-title me-1 mb-0"><?= esc($survey['title']) ?></h4> 
+                            </div>
+                            <div class="col-md-3">
+                                <button 
+                                    class="btn btn-sm btn-primary"
+                                    data-bs-toggle="modal" data-bs-target="#changeTitleModal"
+                                    data-survey-id="<?= esc($survey['survey_id']) ?>"
+                                    data-survey-title="<?= esc($survey['title']) ?>">
+                                    <i style="font-size: 1rem;" class="bi bi-pencil"></i>
 
-                            </button> 
+                                </button>
+                            </div>  
                         </div>
                         <p class="card-text">Updated: <?= esc($survey['updated_at']) ?>.</p>
                         <div>
