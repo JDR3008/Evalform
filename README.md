@@ -17,4 +17,13 @@ Evalform is a survey website that allows users to construct surveys which contai
 - Respondents can answer survey questions provided through the QR code
 
 
+## Technologies Used
+- CodeIgnitor (PHP)
+- HTML
+- CSS
+- JavaScript
+  -  Chart.js
+- MySQL
+
+
 
